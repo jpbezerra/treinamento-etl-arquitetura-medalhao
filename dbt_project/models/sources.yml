@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: bronze
+    schema: main  # schema padrão do DuckDB
+    description: "Dados brutos carregados pelo script Python (Bronze layer)"
+    tables:
+      - name: bronze_flights
+        description: "Voos extraídos da API Schiphol — append-only, campos como string"
+
+      - name: bronze_destinations
+        description: "Destinos extraídos da API Schiphol — append-only, campos como string"

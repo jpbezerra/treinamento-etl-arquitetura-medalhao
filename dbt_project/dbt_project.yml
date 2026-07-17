@@ -1,0 +1,18 @@
+name: schiphol_pipeline
+version: "1.0.0"
+config-version: 2
+
+profile: schiphol_pipeline
+
+model-paths: ["models"]
+target-path: "../data/dbt_target"
+clean-targets: ["../data/dbt_target"]
+
+models:
+  schiphol_pipeline:
+    silver:
+      +schema: silver
+      +materialized: table
+    gold:
+      +schema: gold
+      +materialized: table

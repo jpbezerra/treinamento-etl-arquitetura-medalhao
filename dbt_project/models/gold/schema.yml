@@ -1,0 +1,137 @@
+version: 2
+
+models:
+  - name: dim_destinations
+    description: >
+      Dimensão de aeroportos de destino.
+      Grain: 1 linha = 1 aeroporto (por IATA).
+    columns:
+      - name: destination_sk
+        description: "Surrogate key — md5 do IATA"
+        tests:
+          - not_null
+          - unique
+
+      - name: destination_iata
+        description: "Código IATA do aeroporto (natural key)"
+        tests:
+          - not_null
+          - unique
+
+      - name: destination_name
+        description: "Nome do aeroporto em inglês (ou cidade se não houver nome)"
+
+      - name: destination_name_dutch
+        description: "Nome do aeroporto em holandês"
+
+      - name: city
+        description: "Cidade do aeroporto de destino"
+
+      - name: country
+        description: "País do aeroporto de destino"
+        tests:
+          - not_null
+
+      - name: dt_ingest
+        description: "Data de ingestão do registro (partição lógica)"
+
+      - name: ingestion_ts
+        description: "Timestamp exato em que o registro foi processado"
+
+  - name: fct_flights
+    description: >
+      Fato transacional de voos em Schiphol.
+      Grain: 1 linha = 1 voo (por flight_id).
+      Tipo: Transacional.
+    columns:
+      - name: flight_sk
+        description: "Surrogate key do fato — md5 do flight_id"
+        tests:
+          - not_null
+          - unique
+
+      - name: destination_sk
+        description: "Chave substituta para a dimensão de destinos (dim_destinations)"
+        tests:
+          - relationships:
+              to: ref('dim_destinations')
+              field: destination_sk
+
+      - name: schedule_date_sk
+        description: "Chave substituta da data do agendamento (formato YYYYMMDD)"
+        tests:
+          - not_null
+
+      - name: flight_id
+        description: "ID único do voo"
+        tests:
+          - not_null
+
+      - name: flight_name
+        description: "Nome comercial/código do voo (ex: KL1021)"
+
+      - name: flight_number
+        description: "Número do voo"
+
+      - name: airline_iata
+        description: "Código IATA da companhia aérea"
+
+      - name: flight_direction
+        description: "Direção do voo (A = Arrival, D = Departure)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["A", "D"]
+
+      - name: service_type
+        description: "Tipo de serviço do voo"
+
+      - name: terminal
+        description: "Terminal de embarque/desembarque"
+
+      - name: gate
+        description: "Portão de embarque/desembarque"
+
+      - name: pier
+        description: "Píer de embarque/desembarque"
+
+      - name: flight_state
+        description: "Estado atual público do voo"
+
+      - name: destination_iata_1
+        description: "Código IATA do destino do voo"
+
+      - name: route_eu_zone
+        description: "Flag indicando se a rota está na zona da União Europeia"
+
+      - name: schedule_datetime
+        description: "Data e hora agendadas para o voo"
+        tests:
+          - not_null
+
+      - name: schedule_date
+        description: "Data agendada para o voo"
+
+      - name: actual_landing_time
+        description: "Data e hora reais de pouso"
+
+      - name: estimated_landing_time
+        description: "Data e hora estimadas de pouso"
+
+      - name: actual_off_block_time
+        description: "Data e hora reais de partida (retirada de calços)"
+
+      - name: delay_minutes
+        description: "Delay em minutos (apenas chegadas com pouso real registrado)"
+
+      - name: is_delayed
+        description: "Flag indicando se o voo atrasou mais de 15 minutos"
+
+      - name: dt_ingest
+        description: "Data da ingestão do registro (partição lógica)"
+
+      - name: run_id
+        description: "ID da execução do pipeline de ingestão"
+
+      - name: ingestion_ts
+        description: "Timestamp exato da ingestão"

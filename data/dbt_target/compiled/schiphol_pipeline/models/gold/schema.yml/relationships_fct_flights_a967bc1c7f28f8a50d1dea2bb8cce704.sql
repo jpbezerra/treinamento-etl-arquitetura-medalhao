@@ -1,0 +1,25 @@
+
+    
+    
+
+with child as (
+    select destination_sk as from_field
+    from "warehouse"."main_gold"."fct_flights"
+    where destination_sk is not null
+),
+
+parent as (
+    select destination_sk as to_field
+    from "warehouse"."main_gold"."dim_destinations"
+)
+
+select
+    from_field
+
+from child
+left join parent
+    on child.from_field = parent.to_field
+
+where parent.to_field is null
+
+

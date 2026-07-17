@@ -1,0 +1,138 @@
+version: 2
+
+models:
+  - name: silver_flights
+    description: >
+      Voos da Schiphol conformados — tipados, deduplicados e com flags de qualidade.
+      Grain: 1 linha = 1 voo (versão mais recente por flight_id).
+    columns:
+      - name: flight_id
+        description: "ID único do voo"
+        tests:
+          - not_null:
+              where: "_is_invalid = false"
+          - unique:
+              where: "_is_invalid = false"
+
+      - name: flight_name
+        description: "Nome comercial/código do voo (ex: KL1021)"
+
+      - name: flight_number
+        description: "Número numérico do voo"
+
+      - name: airline_iata
+        description: "Código IATA da companhia aérea"
+
+      - name: airline_icao
+        description: "Código ICAO da companhia aérea"
+
+      - name: flight_direction
+        description: "A = Arrival, D = Departure"
+        tests:
+          - accepted_values:
+              values: ["A", "D"]
+              where: "_is_invalid = false"
+
+      - name: service_type
+        description: "Tipo de serviço do voo (ex: J para voos regulares de passageiros)"
+
+      - name: schedule_datetime
+        description: "Data e hora agendadas para o voo"
+
+      - name: schedule_date
+        description: "Data agendada para o voo"
+
+      - name: actual_landing_time
+        description: "Data e hora reais do pouso (apenas para chegadas)"
+
+      - name: estimated_landing_time
+        description: "Data e hora estimadas do pouso"
+
+      - name: actual_off_block_time
+        description: "Data e hora reais de partida/calços retirados (apenas para partidas)"
+
+      - name: terminal
+        description: "Terminal do aeroporto associado ao voo"
+
+      - name: gate
+        description: "Portão de embarque/desembarque"
+
+      - name: pier
+        description: "Píer do aeroporto associado ao portão"
+
+      - name: destination_iata_1
+        description: "Código IATA do primeiro aeroporto de destino na rota"
+
+      - name: route_eu_zone
+        description: "Flag indicando se a rota está na zona da União Europeia"
+
+      - name: route_visa_required
+        description: "Flag indicando se visto é necessário para a rota"
+
+      - name: flight_state
+        description: "Estado atual público do voo (ex: SCH, LND, etc.)"
+
+      - name: dt_ingest
+        description: "Data da ingestão do registro (partição lógica)"
+
+      - name: run_id
+        description: "ID único da execução do pipeline que ingeriu os dados"
+
+      - name: ingestion_ts
+        description: "Timestamp exato da ingestão na camada Bronze"
+
+      - name: source_system
+        description: "Sistema de origem dos dados"
+
+      - name: _is_invalid
+        description: "TRUE se o registro falhou nas validações de qualidade"
+        tests:
+          - not_null
+
+      - name: _invalid_reason
+        description: "Motivo pelo qual o registro foi marcado como inválido"
+
+  - name: silver_destinations
+    description: >
+      Aeroportos de destino conformados.
+      Grain: 1 linha = 1 aeroporto (por código IATA).
+    columns:
+      - name: iata
+        description: "Código IATA do aeroporto"
+        tests:
+          - not_null:
+              where: "_is_invalid = false"
+          - unique:
+              where: "_is_invalid = false"
+
+      - name: city
+        description: "Cidade onde o aeroporto está localizado"
+
+      - name: country
+        description: "País onde o aeroporto está localizado"
+
+      - name: name_dutch
+        description: "Nome do aeroporto em holandês"
+
+      - name: name_english
+        description: "Nome do aeroporto em inglês"
+
+      - name: dt_ingest
+        description: "Data da ingestão do registro (partição lógica)"
+
+      - name: run_id
+        description: "ID único da execução do pipeline que ingeriu os dados"
+
+      - name: ingestion_ts
+        description: "Timestamp exato da ingestão na camada Bronze"
+
+      - name: source_system
+        description: "Sistema de origem dos dados"
+
+      - name: _is_invalid
+        description: "TRUE se o registro falhou nas validações de qualidade"
+        tests:
+          - not_null
+
+      - name: _invalid_reason
+        description: "Motivo pelo qual o registro foi marcado como inválido"
